@@ -7,10 +7,18 @@
 
 ## Business problem, and the cost of being wrong
 
-The decision I decided to pursue is whether or not a worker is wearing the appropriate safety equipment, in particular a hard hat. If a worker is found to not be wearing a hard hat, the supervisor would go and check it out to make sure. If the model alerts that a worker is not wearing it but the worker is, all that happens is the supervisor will walk over and verify, maybe wasting a few minutes (or not even that, as it's part of his job as a supervisor). If the model does not alert, however, and there is a worker not wearing a hard hat, consequences are much more serious. There are several levels to the severity of this misidentification:
-- real risk of injury -> can cause workers' compensation claims, legal costs and loss of workers
+The decision I decided to pursue is whether or not a worker is wearing the appropriate safety equipment, in particular a hard hat. Someone or, in this case, a model, needs to look at an image to decide whether or not the guideline of wearing a hard hat is being respected.
+
+If the model finds that a worker is not wearing it, the supervisor would go and check to make sure. In the case the model is right, the supervisor will enforce the rule so all workers wear hard hats, thus avoiding a potential fine or safety liability in case of an injury. If the model alerts that a worker is not wearing it but the worker is, all that happens is the supervisor will walk over and verify, maybe wasting a few minutes (or not even "wasting", as it's part of his job as a supervisor so these are just normal work hours not wasted ones). 
+
+If the model does not alert, however, and there is a worker not wearing a hard hat, consequences are much more serious. There are several levels to the severity of this misidentification:
+- real risk of injury -> can cause workers' compensation claims, legal costs and loss of workers.
 - fines -> in the United States, depending on how the Occupational Safety and Health Administration (OSHA) classifies the violation, companies can be fined up to $165,514 (this applies if management intentionally ignored head protection rules, or if the plant has been cited for the same safety violation recently). To be realistic, we will consider the more typical fine values. A serious violation where management knew or should have known about the lack of hard hats can be up to $16,550, and can be multiplied by the number of workers in violation.
-Needless to say, a false negative is significantly more costly and dangerous than a false positive. Where a FP causes at the very most a little extra work from a supervisor, a FN can go up to a hundred thousand dollar fine, although it averages lower at about $10,000 to $20,000, since serious violations are around $16,000.
+
+I want to add that these costs can add up, but they are only realized IF the violation is found out and fined or if an injury takes place and companies must pay compensation to workers. This is taken into consideration when defining cost in the model.
+Needless to say, a false negative is significantly more costly and dangerous than a false positive. Where a FP causes at the very most a little extra work from a supervisor, a FN can go up to a hundred thousand dollar fine (averaging lower at about $10,000 to $20,000, since serious violations are around $16,000).
+
+The costs are converted to euro in the calculations but are taken considering OSHA regulations and USA precedent cases.
 
 ## Dataset
 
@@ -34,7 +42,7 @@ This dataset works for my problem because the `head` class is exactly the violat
 | Valid | 1,413 | 256 (18.1%) | 1,339 | 3,913 | 101 |
 | Test | 706 | 140 (19.8%) | 726 | 1,915 | 64 |
 
-| Class | Median box size (% of image) | Share of boxes under 1% of the image |
+| Class (training split) | Median box size (% of image) | Share of boxes under 1% of the image |
 |---|---|---|
 | `head` | 0.6% | 72% |
 | `helmet` | 0.8% | 56% |
@@ -97,7 +105,7 @@ One case is one camera snapshot of a work area, and it is positive if at least o
 | Outcome | Cost | Where it comes from |
 |---|---|---|
 | False negative (bare head missed) | €1,784.50 | Expected fine plus expected injury cost: ($16,550 x 10% + $42,000 x 1%) x 0.86 €/$ |
-| False positive (false alarm) | €10 | The supervisor walks over for nothing, around 15 minutes of their time at roughly €40/hour |
+| False positive (false alarm) | €10 | The supervisor walks over for nothing. It is part of the job, but it still takes around 15 minutes away from other work, at roughly €40/hour |
 | True positive (correct alarm) | €0 | The supervisor walks over and finds a real violation, which is their job, so it costs nothing extra |
 | True negative | €0 | Nothing happens |
 | Human review | €0.50 | Someone looks at one flagged snapshot for about 30 seconds |
@@ -110,7 +118,7 @@ Together that gives €1,784.50 per miss. I did not add a separate lawsuit cost,
 
 Base rate: 5%. I assume 1 in 20 snapshots on a real site has a bare head in it. The test split has 20%, but those photos were collected to show violations, so they have far more of them than a normal working day would. The cost is calculated on positives and negatives separately and then weighted to 5%.
 
-I swept the threshold from 0 to 1 in steps of 0.01 and calculated the expected cost per 1,000 snapshots at each one. I picked the threshold on the validation split and then reported it on the test split, so the operating point is not tuned on the numbers it is judged by.
+I swept the threshold from 0 to 1 in steps of 0.01 and calculated the expected cost per 1,000 snapshots at each one. The full cost against threshold curve, with the chosen threshold marked, is in the dashboard under "Cost and review". I picked the threshold on the validation split and then reported it on the test split, so the operating point is not tuned on the numbers it is judged by.
 
 | Threshold | Bare heads caught (test) | False alarms (test) | Cost per 1,000 (test) |
 |---|---|---|---|
@@ -178,4 +186,4 @@ On paper, having a person check every snapshot is the cheapest option. That only
 
 ## Generative AI use disclosure
 
-*Per the syllabus AI Policy: what you used and how, or "no AI content used."*
+AI was used to build the Gradio dashboard and help me write the code given all of my own design decisions. For the REPORT.md, it was used at the end to better format my own responses (such as formatting the tables.)
