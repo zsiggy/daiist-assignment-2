@@ -186,4 +186,4 @@ On paper, having a person check every snapshot is the cheapest option. That only
 
 ## Generative AI use disclosure
 
-AI was used to build the Gradio dashboard and help me write the code given all of my own design decisions. For the REPORT.md, it was used at the end to better format my own responses (such as formatting the tables.)
+AI was used to build the Gradio dashboard and help me write the code given my own design decisions. For the REPORT.md, it was used at the end to better format my own responses (such as formatting the tables.) and confirm all my values matched, as I reevaluated costs a few different times and reran leaving some old numbers without realizing.
